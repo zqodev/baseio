@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "string.h"
 
 /*   Recoded functions of string.h
@@ -11,9 +13,13 @@
  *   strlen : Renvoie la longueur de la chaîne str.
  *   strcmp : Compare les chaînes s1 et s2.
  *   strncmp : Compare les n premiers caractères de s1 et s2.
+ *   memcmp : Compare les n premiers octets des zones mémoire s1 et s2.
+ *   memcpy : Copie n octets de la zone mémoire src vers la zone mémoire dest.
  *
  */
 
 int main() {
+
+
     return 0;
 }

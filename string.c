@@ -53,7 +53,7 @@ const char* strrchr(const char *str, int cha) {
 
 int strcmp(const char* str1, const char* str2) {
     if (str1 == NULL || str2 == NULL) {
-        return -1;
+        return 0;
     }
 
     while (*str1 != '\0' && *str2 != '\0' && *str1 == *str2) {
@@ -70,7 +70,7 @@ int strcmp(const char* str1, const char* str2) {
 
 int strncmp(const char* str1, const char* str2, size_t n) {
     if (str1 == NULL || str2 == NULL) {
-        return -1;
+        return 0;
     }
 
     while (n > 0) {
@@ -96,10 +96,7 @@ void strcpy(char* dest, const char* src) {
     }
 
     while (*src != '\0') {
-        *dest = *src;
-
-        dest++;
-        src++;
+        *(dest++) = *(src++);
     }
 
     *dest = '\0';
@@ -129,4 +126,37 @@ size_t strlen(const char *str) {
     }
 
     return end - str;
+}
+
+int memcmp(const void* str1, const void* str2, size_t n) {
+    if (str1 == NULL || str2 == NULL) {
+        return 0;
+    }
+
+    const unsigned char *p1 = str1;
+    const unsigned char *p2 = str2;
+
+    for (size_t i = 0; i < n; i++) {
+        int diff = p1[i] - p2[i];
+        if (diff != 0) {
+            return (diff < 0) ? -1 : 1;
+        }
+    }
+
+    return 0;
+}
+
+void* memcpy(void *dest, const void *src, size_t n) {
+    if (dest == NULL || src == NULL || n == 0) {
+        return NULL;
+    }
+
+    unsigned char *p_dest = dest;
+    const unsigned char *p_src = src;
+
+    while (n--) {
+        *p_dest++ = *p_src++;
+    }
+
+    return dest;
 }
