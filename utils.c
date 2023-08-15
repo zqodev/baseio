@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stddef.h>
 
 /**
@@ -9,7 +8,6 @@ void lowercase(char *str) {
     if (str == NULL) {
         return;
     }
-
     while (*str) {
         if (*str >= 'A' && *str <= 'Z') {
             *str = (*str - 'A') + 'a';
@@ -23,6 +21,9 @@ void lowercase(char *str) {
  * @param str
  */
 void uppercase(char *str) {
+    if (str == NULL) {
+        return;
+    }
     while (*str) {
         if (*str >= 'a' && *str <= 'z') {
             *str = (*str - 'a') + 'A';
@@ -32,10 +33,14 @@ void uppercase(char *str) {
 }
 
 /**
- * Convert all first character in the string to uppercase.
+ * Convert all first characters in the string to uppercase.
  * @param str
  */
 void capitalize(char *str) {
+    if (str == NULL) {
+        return;
+    }
+
     int capitalizeNext = 1;
 
     while (*str) {
