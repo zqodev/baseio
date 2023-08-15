@@ -1,9 +1,9 @@
 #include <stddef.h>
 
 /**
- * Concatène la chaîne src à la fin de dest.
- * @param dest Destination pour la concaténation
- * @param src La chaîne de caractère qui ira à la fin de dest
+ * Concatenates the string src to the end of dest.
+ * @param dest Destination for concatenation
+ * @param src The string to be appended to dest
  */
 void strcat(char *dest, const char *src) {
     while (*dest != '\0') {
@@ -18,10 +18,10 @@ void strcat(char *dest, const char *src) {
 }
 
 /**
- * Concatène au plus n caractères de src à la fin de dest.
- * @param dest Destination pour la concaténation
- * @param src La chaîne de caractère qui ira à la fin de dest
- * @param n Le nombre maximal de caractères à concaténer
+ * Concatenates at most n characters from src to the end of dest.
+ * @param dest Destination for concatenation
+ * @param src The string to be appended to dest
+ * @param n The maximum number of characters to concatenate
  */
 void strncat(char *dest, const char *src, size_t n) {
     while (*dest != '\0') {
@@ -37,10 +37,10 @@ void strncat(char *dest, const char *src, size_t n) {
 }
 
 /**
- * Recherche la première occurrence du caractère cha dans str.
- * @param str La chaîne dans laquelle rechercher
- * @param cha Le caractère à rechercher
- * @return Un pointeur vers la première occurrence de cha dans str, ou NULL si non trouvé
+ * Searches for the first occurrence of character cha in str.
+ * @param str The string in which to search
+ * @param cha The character to search for
+ * @return A pointer to the first occurrence of cha in str, or NULL if not found
  */
 const char* strchr(const char *str, int cha) {
     while (*str != '\0' && *str != cha) {
@@ -51,10 +51,10 @@ const char* strchr(const char *str, int cha) {
 }
 
 /**
- * Recherche la dernière occurrence du caractère cha dans str.
- * @param str La chaîne dans laquelle rechercher
- * @param cha Le caractère à rechercher
- * @return Un pointeur vers la dernière occurrence de cha dans str, ou NULL si non trouvé
+ * Searches for the last occurrence of character cha in str.
+ * @param str The string in which to search
+ * @param cha The character to search for
+ * @return A pointer to the last occurrence of cha in str, or NULL if not found
  */
 const char* strrchr(const char *str, int cha) {
     const char *last_occurrence = NULL;
@@ -74,10 +74,10 @@ const char* strrchr(const char *str, int cha) {
 }
 
 /**
- * Compare les chaînes s1 et s2.
- * @param str1 La première chaîne à comparer
- * @param str2 La deuxième chaîne à comparer
- * @return 0 si les chaînes sont égales, un nombre négatif si str1 < str2, un nombre positif si str1 > str2
+ * Compares strings s1 and s2.
+ * @param str1 The first string to compare
+ * @param str2 The second string to compare
+ * @return 0 if the strings are equal, a negative number if str1 < str2, a positive number if str1 > str2
  */
 int strcmp(const char* str1, const char* str2) {
     if (str1 == NULL || str2 == NULL) {
@@ -97,11 +97,11 @@ int strcmp(const char* str1, const char* str2) {
 }
 
 /**
- * Compare les n premiers caractères de s1 et s2.
- * @param str1 La première chaîne à comparer
- * @param str2 La deuxième chaîne à comparer
- * @param n Le nombre de caractères à comparer
- * @return 0 si les chaînes sont égales, un nombre négatif si str1 < str2, un nombre positif si str1 > str2
+ * Compares the first n characters of s1 and s2.
+ * @param str1 The first string to compare
+ * @param str2 The second string to compare
+ * @param n The number of characters to compare
+ * @return 0 if the strings are equal, a negative number if str1 < str2, a positive number if str1 > str2
  */
 int strncmp(const char* str1, const char* str2, size_t n) {
     if (str1 == NULL || str2 == NULL) {
@@ -126,9 +126,9 @@ int strncmp(const char* str1, const char* str2, size_t n) {
 }
 
 /**
- * Copie la chaîne src dans dest, y compris le caractère nul de fin.
- * @param dest Le tableau de destination
- * @param src La chaîne source à copier
+ * Copies string src into dest, including the null-terminating character.
+ * @param dest The destination array
+ * @param src The source string to copy
  */
 void strcpy(char* dest, const char* src) {
     if (dest == NULL || src == NULL) {
@@ -143,10 +143,10 @@ void strcpy(char* dest, const char* src) {
 }
 
 /**
- * Copie au plus n caractères de src dans dest.
- * @param dest Le tableau de destination
- * @param src La chaîne source à copier
- * @param n Le nombre maximal de caractères à copier
+ * Copies at most n characters from src into dest.
+ * @param dest The destination array
+ * @param src The source string to copy
+ * @param n The maximum number of characters to copy
  */
 void strncpy(char* dest, const char* src, size_t n) {
     if (dest == NULL || src == NULL) {
@@ -165,9 +165,9 @@ void strncpy(char* dest, const char* src, size_t n) {
 }
 
 /**
- * Renvoie la longueur de la chaîne str.
- * @param str La chaîne dont la longueur doit être calculée
- * @return La longueur de la chaîne
+ * Returns the length of string str.
+ * @param str The string whose length should be calculated
+ * @return The length of the string
  */
 size_t strlen(const char *str) {
     const char *end = str;
@@ -180,11 +180,11 @@ size_t strlen(const char *str) {
 }
 
 /**
- * Compare les n premiers octets des zones mémoire s1 et s2.
- * @param str1 Le premier bloc de mémoire à comparer
- * @param str2 Le deuxième bloc de mémoire à comparer
- * @param n Le nombre d'octets à comparer
- * @return 0 si les blocs sont égaux, un nombre négatif si str1 < str2, un nombre positif si str1 > str2
+ * Compares the first n bytes of memory areas str1 and str2.
+ * @param str1 The first memory block to compare
+ * @param str2 The second memory block to compare
+ * @param n The number of bytes to compare
+ * @return 0 if the memory blocks are equal, a negative number if str1 < str2, a positive number if str1 > str2
  */
 int memcmp(const void* str1, const void* str2, size_t n) {
     if (str1 == NULL || str2 == NULL) {
@@ -205,11 +205,11 @@ int memcmp(const void* str1, const void* str2, size_t n) {
 }
 
 /**
- * Copie n octets de la zone mémoire src vers la zone mémoire dest.
- * @param dest Le bloc de mémoire de destination
- * @param src Le bloc de mémoire source
- * @param n Le nombre d'octets à copier
- * @return Un pointeur vers dest
+ * Copies n bytes from the memory area src to the memory area dest.
+ * @param dest The destination memory block
+ * @param src The source memory block
+ * @param n The number of bytes to copy
+ * @return A pointer to dest
  */
 void* memcpy(void *dest, const void *src, size_t n) {
     if (dest == NULL || src == NULL || n == 0) {
@@ -227,11 +227,11 @@ void* memcpy(void *dest, const void *src, size_t n) {
 }
 
 /**
- * Copie n octets de la zone mémoire src vers la zone mémoire dest (les zones peuvent se chevaucher).
- * @param dest Le bloc de mémoire de destination
- * @param src Le bloc de mémoire source
- * @param n Le nombre d'octets à copier
- * @return Un pointeur vers dest
+ * Copies n bytes from the memory area src to the memory area dest (areas may overlap).
+ * @param dest The destination memory block
+ * @param src The source memory block
+ * @param n The number of bytes to copy
+ * @return A pointer to dest
  */
 void* memmove(void *dest, const void *src, size_t n) {
     if (dest == NULL || src == NULL || n == 0) {
