@@ -1,7 +1,41 @@
 #include <stddef.h>
 
+#include "utils.h"
+
 /**
- * Concatenates the string src to the end of dest.
+ * @brief Returns the length of string str.
+ * @param str The string whose length should be calculated
+ * @return The length of the string
+ */
+size_t strlen(const char *str) {
+    const char *end = str;
+
+    while (*end) {
+        end++;
+    }
+
+    return end - str;
+}
+
+/**
+ * @brief Copies string src into dest, including the null-terminating character.
+ * @param dest The destination array
+ * @param src The source string to copy
+ */
+void strcpy(char* dest, const char* src) {
+    if (dest == NULL || src == NULL) {
+        return;
+    }
+
+    while (*src != '\0') {
+        *(dest++) = *(src++);
+    }
+
+    *dest = '\0';
+}
+
+/**
+ * @brief Concatenates the string src to the end of dest.
  * @param dest Destination for concatenation
  * @param src The string to be appended to dest
  */
@@ -18,7 +52,7 @@ void strcat(char *dest, const char *src) {
 }
 
 /**
- * Concatenates at most n characters from src to the end of dest.
+ * @brief Concatenates at most n characters from src to the end of dest.
  * @param dest Destination for concatenation
  * @param src The string to be appended to dest
  * @param n The maximum number of characters to concatenate
@@ -37,7 +71,7 @@ void strncat(char *dest, const char *src, size_t n) {
 }
 
 /**
- * Searches for the first occurrence of character cha in str.
+ * @brief Searches for the first occurrence of character cha in str.
  * @param str The string in which to search
  * @param cha The character to search for
  * @return A pointer to the first occurrence of cha in str, or NULL if not found
@@ -51,7 +85,7 @@ const char* strchr(const char *str, int cha) {
 }
 
 /**
- * Searches for the last occurrence of character cha in str.
+ * @brief Searches for the last occurrence of character cha in str.
  * @param str The string in which to search
  * @param cha The character to search for
  * @return A pointer to the last occurrence of cha in str, or NULL if not found
@@ -74,7 +108,7 @@ const char* strrchr(const char *str, int cha) {
 }
 
 /**
- * Compares strings s1 and s2.
+ * @brief Compares strings s1 and s2.
  * @param str1 The first string to compare
  * @param str2 The second string to compare
  * @return 0 if the strings are equal, a negative number if str1 < str2, a positive number if str1 > str2
@@ -97,7 +131,7 @@ int strcmp(const char* str1, const char* str2) {
 }
 
 /**
- * Compares the first n characters of s1 and s2.
+ * @brief Compares the first n characters of s1 and s2.
  * @param str1 The first string to compare
  * @param str2 The second string to compare
  * @param n The number of characters to compare
@@ -126,24 +160,55 @@ int strncmp(const char* str1, const char* str2, size_t n) {
 }
 
 /**
- * Copies string src into dest, including the null-terminating character.
- * @param dest The destination array
- * @param src The source string to copy
+ * @brief Compares strings s1 and s2, ignoring case differences.
+ * @param str1 The first string to compare
+ * @param str2 The second string to compare
+ * @return 0 if the strings are equal, a negative number if str1 < str2, a positive number if str1 > str2
  */
-void strcpy(char* dest, const char* src) {
-    if (dest == NULL || src == NULL) {
-        return;
+int strcasecmp(char * str1, char* str2) {
+    if (str1 == NULL || str2 == NULL) {
+        return 0;
     }
 
-    while (*src != '\0') {
-        *(dest++) = *(src++);
-    }
+    char temp_str1[strlen(str1) + 1];
+    char temp_str2[strlen(str2) + 1];
 
-    *dest = '\0';
+    strcpy(temp_str1, str1);
+    strcpy(temp_str2, str2);
+
+    lowercase(temp_str1);
+    lowercase(temp_str2);
+
+    return strcmp(temp_str1, temp_str2);
 }
 
 /**
- * Copies at most n characters from src into dest.
+ * @brief Compares the first n characters of s1 and s2, ignoring case differences.
+ * @param str1
+ * @param str2
+ * @param n
+ * @return 0 if the strings are equal, a negative number if str1 < str2, a positive number if str1 > str2
+ */
+int strncasecmp(char * str1, char* str2, size_t n) {
+    if (str1 == NULL || str2 == NULL || n == 0) {
+        return 0;
+    }
+
+    char temp_str1[strlen(str1) + 1];
+    char temp_str2[strlen(str2) + 1];
+
+    strcpy(temp_str1, str1);
+    strcpy(temp_str2, str2);
+
+    lowercase(temp_str1);
+    lowercase(temp_str2);
+
+    return strncmp(temp_str1, temp_str2, n);
+}
+
+
+/**
+ * @brief Copies at most n characters from src into dest.
  * @param dest The destination array
  * @param src The source string to copy
  * @param n The maximum number of characters to copy
@@ -165,22 +230,7 @@ void strncpy(char* dest, const char* src, size_t n) {
 }
 
 /**
- * Returns the length of string str.
- * @param str The string whose length should be calculated
- * @return The length of the string
- */
-size_t strlen(const char *str) {
-    const char *end = str;
-
-    while (*end) {
-        end++;
-    }
-
-    return end - str;
-}
-
-/**
- * Compares the first n bytes of memory areas str1 and str2.
+ * @brief Compares the first n bytes of memory areas str1 and str2.
  * @param str1 The first memory block to compare
  * @param str2 The second memory block to compare
  * @param n The number of bytes to compare
@@ -205,7 +255,7 @@ int memcmp(const void* str1, const void* str2, size_t n) {
 }
 
 /**
- * Copies n bytes from the memory area src to the memory area dest.
+ * @brief Copies n bytes from the memory area src to the memory area dest.
  * @param dest The destination memory block
  * @param src The source memory block
  * @param n The number of bytes to copy
@@ -227,7 +277,7 @@ void* memcpy(void *dest, const void *src, size_t n) {
 }
 
 /**
- * Copies n bytes from the memory area src to the memory area dest (areas may overlap).
+ * @brief Copies n bytes from the memory area src to the memory area dest (areas may overlap).
  * @param dest The destination memory block
  * @param src The source memory block
  * @param n The number of bytes to copy
