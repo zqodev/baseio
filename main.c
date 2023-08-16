@@ -3,7 +3,7 @@
 #include "string.h"
 #include "utils.h"
 
-int main()
+int main(void)
 {
 
     return 0;

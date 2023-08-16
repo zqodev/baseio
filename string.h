@@ -2,8 +2,8 @@
 
 int strlen(const char *str);
 void strcpy(char* dest, const char* src);
-void strcat(char *dest, const char *src);
-void strncat(char *dest, const char *src, size_t n);
+const char* strcat(char *dest, const char *src);
+const char* strncat(char *dest, const char *src, size_t n);
 const char* strchr(const char *str, int cha);
 const char* strrchr(const char *str, int cha);
 int strcmp(const char* str1, const char* str2);

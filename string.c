@@ -37,16 +37,20 @@ void strcpy(char* dest, const char* src)
  * @brief Concatenates the string src to the end of dest.
  * @param dest Destination for concatenation
  * @param src The string to be appended to dest
+ * @return A pointer to the destination string dest.
  */
-void strcat(char *dest, const char *src)
+const char* strcat(char *dest, const char *src)
 {
-    while (*dest != '\0') {
-        dest++;
+    char *dest_ptr = dest;
+
+    while (*dest_ptr != '\0') {
+        dest_ptr++;
     }
     while (*src != '\0') {
-        *(dest++) = *(src++);
+        *(dest_ptr++) = *(src++);
     }
-    *dest = '\0';
+    *dest_ptr = '\0';
+    return dest;
 }
 
 /**
@@ -54,17 +58,21 @@ void strcat(char *dest, const char *src)
  * @param dest Destination for concatenation
  * @param src The string to be appended to dest
  * @param n The maximum number of characters to concatenate
+ * @return A pointer to the destination buffer dest.
  */
-void strncat(char *dest, const char *src, size_t n)
+const char* strncat(char *dest, const char *src, size_t n)
 {
-    while (*dest != '\0') {
-        dest++;
+    char *dest_ptr = dest;
+
+    while (*dest_ptr != '\0') {
+        dest_ptr++;
     }
     while (n > 0 && *src != '\0') {
-        *(dest++) = *(src++);
+        *(dest_ptr++) = *(src++);
         n--;
     }
     *dest = '\0';
+    return dest;
 }
 
 /**
