@@ -41,16 +41,16 @@ void capitalize(char *str) {
         return;
     }
 
-    int capitalizeNext = 1;
+    int capitalize_next = 1;
 
     while (*str) {
         if (*str == ' ' || *str == '\t' || *str == '\n') {
-            capitalizeNext = 1;
+            capitalize_next = 1;
         } else {
-            if (capitalizeNext && *str >= 'a' && *str <= 'z') {
+            if (capitalize_next && *str >= 'a' && *str <= 'z') {
                 *str = (*str - 'a') + 'A';
             }
-            capitalizeNext = 0;
+            capitalize_next = 0;
         }
         str++;
     }
