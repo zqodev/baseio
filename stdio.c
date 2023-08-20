@@ -104,7 +104,7 @@ void print_unsigned_long(unsigned long num)
     }
 }
 
-void print_float(double num) {
+void print_float(double num, int precision) {
     if (num == 0) {
         putchar('0');
         return;
@@ -114,6 +114,7 @@ void print_float(double num) {
         putchar('-');
         num = -num;
     }
+
 
     int int_part = (int)num;
     double frac_part = num - int_part;
@@ -130,19 +131,29 @@ void print_float(double num) {
         index--;
         putchar(int_digits[index]);
     }
-    if (frac_part > 0) {
+    if (precision > 0) {
         putchar('.');
-        int frac_index;
-        for (frac_index = 0; frac_index < 6; frac_index++) {
+        for (int frac_index = 0; frac_index < precision; frac_index++) {
             frac_part *= 10;
             int digit = (int)frac_part;
             putchar('0' + digit);
             frac_part -= digit;
         }
+    } else if (precision == 0) {
+        if (frac_part > 0) {
+            putchar('.');
+            int frac_index;
+            for (frac_index = 0; frac_index < 6; frac_index++) {
+                frac_part *= 10;
+                int digit = (int)frac_part;
+                putchar('0' + digit);
+                frac_part -= digit;
+            }
+        }
     }
 }
 
-void print_float_scientific(double num)
+void print_float_scientific(double num, int precision)
 {
     if (num < 0) {
         putchar('-');
@@ -165,21 +176,39 @@ void print_float_scientific(double num)
     int significand = (int)num;
     putchar('0' + significand);
     putchar('.');
-    int frac_digits = 6;
-    while (frac_digits > 0) {
-        num -= significand;
-        num *= 10.0;
-        significand = (int)num;
-        putchar('0' + significand);
-        frac_digits--;
-    }
 
-    putchar('e');
-    if (exponent >= 0) {
-        putchar('+');
-    } else {
-        putchar('-');
-        exponent = -exponent;
+    if (precision > 0) {
+        for (int frac_index = 0; frac_index < precision; frac_index++) {
+            num -= significand;
+            num *= 10.0;
+            significand = (int)num;
+            putchar('0' + significand);
+        }
+
+        putchar('e');
+        if (exponent >= 0) {
+            putchar('+');
+        } else {
+            putchar('-');
+            exponent = -exponent;
+        }
+    } else if (precision == 0) {
+        int frac_digits = 6;
+        while (frac_digits > 0) {
+            num -= significand;
+            num *= 10.0;
+            significand = (int)num;
+            putchar('0' + significand);
+            frac_digits--;
+        }
+
+        putchar('e');
+        if (exponent >= 0) {
+            putchar('+');
+        } else {
+            putchar('-');
+            exponent = -exponent;
+        }
     }
 
     print_signed_int(exponent);
@@ -313,12 +342,44 @@ void printf(char* format, ...)
             }
             case 'f': {
                 double num = va_arg(args, double);
-                print_float(num);
+                print_float(num, 0);
                 break;
             }
             case 'e': {
                 double num = va_arg(args, double);
-                print_float_scientific(num);
+                print_float_scientific(num, 0);
+                break;
+            }
+            case 'p': {
+                void* ptr = va_arg(args, void*);
+                // TODO FIX
+                // print_hex((unsigned int)ptr, 0);
+            }
+            case '.': {
+                p_format++;
+                int precision = 0;
+                while (*p_format >= '0' && *p_format <= '9') {
+                    precision = precision * 10 + (*p_format - '0');
+                    p_format++;
+                }
+                switch (*p_format) {
+                    case 'f': {
+                        double num = va_arg(args, double);
+                        print_float(num, precision);
+                        break;
+                    }
+                    case 'e': {
+                        double num = va_arg(args, double);
+                        print_float_scientific(num, precision);
+                        break;
+                    }
+                    default: {
+                        putchar('%');
+                        putchar('.');
+                        putchar(*p_format);
+                        break;
+                    }
+                }
                 break;
             }
             default: {
@@ -337,12 +398,13 @@ void printf(char* format, ...)
 * %u : Entier non signé.
 * %ld : Long entier signé.
 * %lu : Long entier non signé.
-* %f : Nombre à virgule flottante en notation décimale.
-* %e : Nombre à virgule flottante en notation scientifique.
+* %f : Nombre à virgule flottante en notation décimale. (Works with %.2f)
+* %e : Nombre à virgule flottante en notation scientifique. (Works with %.2e)
 * %s : Chaîne de caractères.
 * %c : Caractère.
 * %x : Entier non signé en hexadécimal (lettres en minuscules).
 * %X : Entier non signé en hexadécimal (lettres en majuscules).
 * %o : Entier non signé en octal.
 * %% : Caractère '%' littéral.
- */
+* %p : Pointeur
+*/
