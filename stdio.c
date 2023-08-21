@@ -1,58 +1,18 @@
 #include <stdarg.h>
 #include <unistd.h>
 
-#define SHORT_MAX 32767
-#define SHORT_MIN (-32768)
-#define USHORT_MAX 65535
-#define LLONG_MAX 9223372036854775807LL
-#define LLONG_MIN (-LLONG_MAX - 1)
-#define ULLONG_MAX 18446744073709551615ULL
-
-typedef struct {
-    char identifier;
-    void (*print_function)(va_list args);
-} Formatter;
-
 void putchar(char c)
 {
     write(1, &c, 1);
 }
 
-/*
- * PRINTS
- */
-
-void print_character(va_list args)
+void print_signed_int(int num)
 {
-    char ch = va_arg(args, int);
-    putchar(ch);
-}
-
-void print_string(va_list args)
-{
-    char* str = va_arg(args, char*);
-    while (*str != '\0') {
-        putchar(*str);
-        str++;
-    }
-}
-
-void print_string_direct(char* str)
-{
-    while (*str != '\0') {
-        putchar(*str);
-        str++;
-    }
-}
-
-void print_signed_int(va_list args)
-{
-    int num = va_arg(args, int);
-
     if (num == 0) {
         putchar('0');
         return;
     }
+
     if (num < 0) {
         putchar('-');
         num = -num;
@@ -72,35 +32,8 @@ void print_signed_int(va_list args)
     }
 }
 
-void print_signed_int_direct(int num)
+void print_unsigned_int(unsigned int num)
 {
-    if (num == 0) {
-        putchar('0');
-        return;
-    }
-    if (num < 0) {
-        putchar('-');
-        num = -num;
-    }
-
-    char digits[10];
-    int index = 0;
-
-    while (num > 0) {
-        digits[index] = '0' + (num % 10);
-        num /= 10;
-        index++;
-    }
-    while (index > 0) {
-        index--;
-        putchar(digits[index]);
-    }
-}
-
-void print_unsigned_int(va_list args)
-{
-    unsigned int num = va_arg(args, unsigned int);
-
     if (num == 0) {
         putchar('0');
         return;
@@ -120,10 +53,8 @@ void print_unsigned_int(va_list args)
     }
 }
 
-void print_signed_long(va_list args)
+void print_signed_long(long num)
 {
-    long num = va_arg(args, long);
-
     if (num == 0) {
         putchar('0');
         return;
@@ -148,10 +79,8 @@ void print_signed_long(va_list args)
     }
 }
 
-void print_unsigned_long(va_list args)
+void print_unsigned_long(unsigned long num)
 {
-    long num = va_arg(args, unsigned long);
-
     if (num == 0) {
         putchar('0');
         return;
@@ -171,15 +100,29 @@ void print_unsigned_long(va_list args)
     }
 }
 
-void print_signed_long_long(va_list args)
+void print_octal_unsigned_long(unsigned long num)
 {
-    long long num = va_arg(args, long long);
-
-    if (num > LLONG_MAX || num < LLONG_MIN) {
-        print_string_direct("Value out of range for a long long");
+    if (num == 0) {
+        putchar('0');
         return;
     }
 
+    char digits[22];
+    int index = 0;
+
+    while (num > 0) {
+        digits[index] = '0' + (num % 8);
+        num /= 8;
+        index++;
+    }
+    while (index > 0) {
+        index--;
+        putchar(digits[index]);
+    }
+}
+
+void print_signed_long_long(long long num)
+{
     if (num == 0) {
         putchar('0');
         return;
@@ -204,10 +147,8 @@ void print_signed_long_long(va_list args)
     }
 }
 
-void print_unsigned_long_long(va_list args)
+void print_unsigned_long_long(unsigned long long num)
 {
-   unsigned long long num = va_arg(args, unsigned long long);
-
     if (num == 0) {
         putchar('0');
         return;
@@ -227,71 +168,7 @@ void print_unsigned_long_long(va_list args)
     }
 }
 
-
-void print_signed_short(va_list args)
-{
-    int num = va_arg(args, int);
-
-    if (num > SHORT_MAX || num < SHORT_MIN) {
-        print_string_direct("Value out of range for a short");
-        return;
-    }
-
-    if (num == 0) {
-        putchar('0');
-        return;
-    }
-
-    if (num < 0) {
-        putchar('-');
-        num = -num;
-    }
-
-    char digits[10];
-    int index = 0;
-
-    while (num > 0) {
-        digits[index] = '0' + (num % 10);
-        num /= 10;
-        index++;
-    }
-    while (index > 0) {
-        index--;
-        putchar(digits[index]);
-    }
-}
-
-void print_unsigned_short(va_list args)
-{
-    unsigned int num = va_arg(args, unsigned int);
-
-    if (num > USHORT_MAX) {
-        print_string_direct("Value out of range for an unsigned short");
-        return;
-    }
-
-    if (num == 0) {
-        putchar('0');
-        return;
-    }
-
-    char digits[10];
-    int index = 0;
-
-    while (num > 0) {
-        digits[index] = '0' + (num % 10);
-        num /= 10;
-        index++;
-    }
-    while (index > 0) {
-        index--;
-        putchar(digits[index]);
-    }
-}
-
-void print_float(va_list args) {
-    double num = va_arg(args, double);
-
+void print_float(double num, int precision) {
     if (num == 0) {
         putchar('0');
         return;
@@ -304,7 +181,6 @@ void print_float(va_list args) {
 
     int int_part = (int)num;
     double frac_part = num - int_part;
-
     char int_digits[20];
     int index = 0;
 
@@ -317,22 +193,30 @@ void print_float(va_list args) {
         index--;
         putchar(int_digits[index]);
     }
-    if (frac_part > 0) {
+    if (precision > 0) {
         putchar('.');
-        int frac_index;
-        for (frac_index = 0; frac_index < 6; frac_index++) {
+        for (int frac_index = 0; frac_index < precision; frac_index++) {
             frac_part *= 10;
             int digit = (int)frac_part;
             putchar('0' + digit);
             frac_part -= digit;
         }
+    } else if (precision == 0) {
+        if (frac_part > 0) {
+            putchar('.');
+            int frac_index;
+            for (frac_index = 0; frac_index < 6; frac_index++) {
+                frac_part *= 10;
+                int digit = (int)frac_part;
+                putchar('0' + digit);
+                frac_part -= digit;
+            }
+        }
     }
 }
 
-void print_float_scientific(va_list args)
+void print_float_scientific(double num, int precision)
 {
-    double num = va_arg(args, double);
-
     if (num < 0) {
         putchar('-');
         num = -num;
@@ -352,37 +236,104 @@ void print_float_scientific(va_list args)
     }
 
     int significand = (int)num;
-
     putchar('0' + significand);
     putchar('.');
-    int frac_digits = 6;
-    while (frac_digits > 0) {
-        num -= significand;
-        num *= 10.0;
-        significand = (int)num;
-        putchar('0' + significand);
-        frac_digits--;
+
+    if (precision > 0) {
+        for (int frac_index = 0; frac_index < precision; frac_index++) {
+            num -= significand;
+            num *= 10.0;
+            significand = (int)num;
+            putchar('0' + significand);
+        }
+
+        putchar('e');
+        if (exponent >= 0) {
+            putchar('+');
+        } else {
+            putchar('-');
+            exponent = -exponent;
+        }
+    } else if (precision == 0) {
+        int frac_digits = 6;
+        while (frac_digits > 0) {
+            num -= significand;
+            num *= 10.0;
+            significand = (int)num;
+            putchar('0' + significand);
+            frac_digits--;
+        }
+
+        putchar('e');
+        if (exponent >= 0) {
+            putchar('+');
+        } else {
+            putchar('-');
+            exponent = -exponent;
+        }
     }
-    putchar('e');
-    if (exponent >= 0) {
-        putchar('+');
-    } else {
+
+    print_signed_int(exponent);
+}
+
+
+void print_signed_short(int num)
+{
+    if (num == 0) {
+        putchar('0');
+        return;
+    }
+
+    if (num < 0) {
         putchar('-');
-        exponent = -exponent;
+        num = -num;
     }
-    print_signed_int_direct(exponent);
+
+    char digits[10];
+    int index = 0;
+
+    while (num > 0) {
+        digits[index] = '0' + (num % 10);
+        num /= 10;
+        index++;
+    }
+    while (index > 0) {
+        index--;
+        putchar(digits[index]);
+    }
 }
 
-void print_hex_lower(va_list args)
+void print_unsigned_short(unsigned int num)
 {
-    unsigned int num = va_arg(args, unsigned int);
-
     if (num == 0) {
         putchar('0');
         return;
     }
 
-    char hex_digits[] = "0123456789abcdef";
+    char digits[10];
+    int index = 0;
+
+    while (num > 0) {
+        digits[index] = '0' + (num % 10);
+        num /= 10;
+        index++;
+    }
+    while (index > 0) {
+        index--;
+        putchar(digits[index]);
+    }
+}
+
+void print_hex(unsigned int num, int uppercase)
+{
+    if (num == 0) {
+        putchar('0');
+        return;
+    }
+
+    char hex_digits_upper[] = "0123456789ABCDEF";
+    char hex_digits_lower[] = "0123456789abcdef";
+    char* hex_digits = uppercase ? hex_digits_upper : hex_digits_lower;
     char hex_string[10];
     int index = 0;
 
@@ -397,34 +348,8 @@ void print_hex_lower(va_list args)
     }
 }
 
-void print_hex_upper(va_list args)
+void print_float_hex(double num, int uppercase)
 {
-    unsigned int num = va_arg(args, unsigned int);
-
-    if (num == 0) {
-        putchar('0');
-        return;
-    }
-
-    char hex_digits[] = "0123456789ABCDEF";
-    char hex_string[10];
-    int index = 0;
-
-    while (num > 0) {
-        hex_string[index] = hex_digits[num % 16];
-        num /= 16;
-        index++;
-    }
-    while (index > 0) {
-        index--;
-        putchar(hex_string[index]);
-    }
-}
-
-void print_float_hex_lower(va_list args)
-{
-    double num = va_arg(args, double);
-
     if (num == 0) {
         putchar('0');
         return;
@@ -432,7 +357,9 @@ void print_float_hex_lower(va_list args)
 
     unsigned long long int_bits = *(unsigned long long *)&num;
 
-    char hex_digits[] = "0123456789abcdef";
+    char hex_digits_upper[] = "0123456789ABCDEF";
+    char hex_digits_lower[] = "0123456789abcdef";
+    char* hex_digits = uppercase ? hex_digits_upper : hex_digits_lower;
     char hex_string[20];
     int index = 0;
 
@@ -447,36 +374,8 @@ void print_float_hex_lower(va_list args)
     }
 }
 
-void print_float_hex_upper(va_list args)
+void print_octal(unsigned int num)
 {
-    double num = va_arg(args, double);
-
-    if (num == 0) {
-        putchar('0');
-        return;
-    }
-
-    unsigned long long int_bits = *(unsigned long long *)&num;
-
-    char hex_digits[] = "0123456789ABCDEF";
-    char hex_string[20];
-    int index = 0;
-
-    while (int_bits > 0) {
-        hex_string[index] = hex_digits[int_bits % 16];
-        int_bits /= 16;
-        index++;
-    }
-    while (index > 0) {
-        index--;
-        putchar(hex_string[index]);
-    }
-}
-
-void print_octal(va_list args)
-{
-    unsigned int num = va_arg(args, int);
-
     if (num == 0) {
         putchar('0');
         return;
@@ -496,9 +395,8 @@ void print_octal(va_list args)
     }
 }
 
-void print_pointer(va_list args)
+void print_pointer(void* ptr)
 {
-    void *ptr = va_arg(args, void*);
     uintptr_t ptr_value = (uintptr_t)ptr;
     int num_hex_digits = sizeof(ptr_value) * 2;
     char hex_digits[] = "0123456789abcdef";
@@ -518,38 +416,6 @@ void print_pointer(va_list args)
     }
 }
 
-void print_default(va_list args)
-{
-    putchar('%');
-}
-
-Formatter formatters[] = {
-    {'c', print_character},
-    {'s', print_string},
-    {'d', print_signed_int},
-    {'u', print_unsigned_int},
-    {'l', print_signed_long},
-    {'L', print_unsigned_long},
-    {'g', print_signed_long_long},
-    {'G', print_unsigned_long_long},
-    {'h', print_signed_short},
-    {'H', print_unsigned_short},
-    {'x', print_hex_lower},
-    {'X', print_hex_upper},
-    {'a', print_float_hex_lower},
-    {'A', print_float_hex_upper},
-    {'o', print_octal},
-    {'f', print_float},
-    {'e', print_float_scientific},
-    {'p', print_pointer},
-    {'%', print_default},
-};
-
-
-/*
- * MAIN
- */
-
 void printf(char* format, ...)
 {
     va_list args;
@@ -563,24 +429,150 @@ void printf(char* format, ...)
             continue;
         }
         p_format++;
-        char formatter_char = *p_format;
-        p_format++;
-
-        int num_formatters = sizeof(formatters) / sizeof(Formatter);
-        int found_formatter = -1;
-        for (int i = 0; i < num_formatters; i++) {
-            if (formatters[i].identifier == formatter_char) {
-                found_formatter = i;
-                break;
+        if (*p_format != '%') {
+            switch (*p_format) {
+                case 'c': {
+                    putchar(va_arg(args, int));
+                    break;
+                }
+                case 's': {
+                    char* str = va_arg(args, char*);
+                    while (*str != '\0') {
+                        putchar(*str);
+                        str++;
+                    }
+                    break;
+                }
+                case 'd': {
+                    print_signed_int(va_arg(args, int));
+                    break;
+                }
+                case 'u': {
+                    print_unsigned_int(va_arg(args, unsigned int));
+                    break;
+                }
+                case 'x': {
+                    print_hex(va_arg(args, unsigned int), 0);
+                    break;
+                }
+                case 'X': {
+                    print_hex(va_arg(args, unsigned int), 1);
+                    break;
+                }
+                case 'a': {
+                    print_float_hex(va_arg(args, double), 0);
+                    break;
+                }
+                case 'A': {
+                    print_float_hex(va_arg(args, double), 1);
+                }
+                case 'o': {
+                    print_octal(va_arg(args, unsigned int));
+                    break;
+                }
+                case 'l': {
+                    p_format++;
+                    switch (*p_format) {
+                        case 'd': {
+                            print_signed_long(va_arg(args, long));
+                            break;
+                        }
+                        case 'u': {
+                            print_unsigned_long(va_arg(args, unsigned long));
+                            break;
+                        }
+                        case 'o': {
+                            print_octal_unsigned_long(va_arg(args, unsigned long));
+                            break;
+                        }
+                        case 'l': {
+                            p_format++;
+                            switch (*p_format) {
+                                case 'd': {
+                                    print_signed_long_long(va_arg(args, long long));
+                                    break;
+                                }
+                                case 'u': {
+                                    print_unsigned_long_long(va_arg(args, unsigned long long));
+                                    break;
+                                }
+                                default:
+                                    putchar('%');
+                                    putchar('l');
+                                    putchar('l');
+                                    putchar(*p_format);
+                                    break;
+                            }
+                            break;
+                        }
+                        default:
+                            putchar('%');
+                            putchar('l');
+                            putchar(*p_format);
+                            break;
+                    }
+                    break;
+                }
+                case 'h': {
+                    p_format++;
+                    switch (*p_format) {
+                        case 'd': {
+                            print_signed_short(va_arg(args, int));
+                            break;
+                        }
+                        case 'u': {
+                            print_unsigned_short(va_arg(args, unsigned int));
+                            break;
+                        }
+                    }
+                }
+                case 'f': {
+                    print_float(va_arg(args, double), 0);
+                    break;
+                }
+                case 'e': {
+                    print_float_scientific(va_arg(args, double), 0);
+                    break;
+                }
+                case 'p': {
+                    print_pointer(va_arg(args, void*));
+                    break;
+                }
+                case '.': {
+                    p_format++;
+                    int precision = 0;
+                    while (*p_format >= '0' && *p_format <= '9') {
+                        precision = precision * 10 + (*p_format - '0');
+                        p_format++;
+                    }
+                    switch (*p_format) {
+                        case 'f': {
+                            print_float(va_arg(args, double), precision);
+                            break;
+                        }
+                        case 'e': {
+                            print_float_scientific(va_arg(args, double), precision);
+                            break;
+                        }
+                        default: {
+                            putchar('%');
+                            putchar('.');
+                            putchar(*p_format);
+                            break;
+                        }
+                    }
+                    break;
+                }
+                default: {
+                    putchar('%');
+                    putchar(*p_format);
+                    break;
+                }
             }
-        }
-
-        if (found_formatter != -1) {
-            formatters[found_formatter].print_function(args);
         } else {
             putchar('%');
-            putchar(formatter_char);
         }
+        p_format++;
     }
     va_end(args);
 }
@@ -588,18 +580,31 @@ void printf(char* format, ...)
 /**
 %d : Entier signé.
 %u : Entier non signé.
-%l : Long entier signé.
-%L : Long entier non signé.
-%g : Long long entier signé.
-%G : Long long entier non signé.
-%h : Short entier signé.
-%H : Short entier non signé.
-TODO %jd : Intmax_t entier signé.
-TODO %ju : Uintmax_t entier non signé.
-TODO %zd : size_t entier signé.
-TODO %zu : size_t entier non signé.
-TODO %td : ptrdiff_t entier signé.
-TODO %tu : ptrdiff_t entier non signé.
+%ld : Long entier signé.
+%lu : Long entier non signé.
+%lo : Entier non signé en long en octal
+TODO %lx : Entier long non signé en hexadécimal
+TODO %lX : Entier long non signé en hexadécimal (majuscules)
+TODO %Lf : Nombre à virgule flottante en double
+TODO %Le : Nombre à virgule flottante en double en notation scientifique (exponentielle, minuscules)
+TODO %LE : Nombre à virgule flottante en double en notation scientifique (exponentielle, majuscules)
+TODO %La : Nombre à virgule flottante en double en notation hexadécimale (minuscules)
+TODO %LA : Nombre à virgule flottante en double en notation hexadécimale (majuscules)
+%lld : Long long entier signé.
+%llu : Long long entier non signé.
+TODO %llo : Entier non signé en long long en octal
+TODO %llx : Entier long long non signé en hexadécimal
+TODO %llX : Entier long long non signé en hexadécimal (majuscules)
+%hd : Short entier signé.
+%hu : Short entier non signé.
+TODO %ho : Entier non signé en short en octal
+TODO %hx : Entier court (short) non signé en hexadécimal
+TODO %hX : Entier court (short) non signé en hexadécimal (majuscules)
+TODO %hhd : Entier signé en char
+TODO %hhu : Entier non signé en char
+TODO %hho : Entier non signé en char en octal
+TODO %hhx : Entier non signé en char en hexadécimal (lettres minuscules)
+TODO %hhX : Entier non signé en char en hexadécimal (lettres majuscules)
 %o : Entier non signé en octal.
 %x : Entier non signé en hexadécimal (lettres en minuscules).
 %X : Entier non signé en hexadécimal (lettres en majuscules).
@@ -611,4 +616,5 @@ TODO %tu : ptrdiff_t entier non signé.
 %s : Chaîne de caractères.
 %p : Pointeur.
 %% : Caractère '%' littéral.
+TODO %n : Nombre d'octets écrits jusqu'à ce point est stocké dans l'argument correspondant
 */
